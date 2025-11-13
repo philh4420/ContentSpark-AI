@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -153,7 +154,22 @@ const App: React.FC = () => {
 
     try {
       const response = await generatePostContentFromUrl(url, platforms, tone, userProfile);
-      const jsonResponse = JSON.parse(response.text);
+      // FIX: The response from a model using the googleSearch tool is not guaranteed to be valid JSON.
+      // This block attempts to extract a JSON object from the response text to make parsing more robust,
+      // handling cases where the JSON is embedded in markdown or other text.
+      let responseText = response.text.trim();
+      const markdownMatch = responseText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+      if (markdownMatch) {
+        responseText = markdownMatch[1];
+      } else {
+        const firstBrace = responseText.indexOf('{');
+        const lastBrace = responseText.lastIndexOf('}');
+        if (firstBrace !== -1 && lastBrace > firstBrace) {
+          responseText = responseText.substring(firstBrace, lastBrace + 1);
+        }
+      }
+
+      const jsonResponse = JSON.parse(responseText);
       const { imagePrompt, posts: generatedPosts, idea } = jsonResponse;
       await processAndSavePosts(generatedPosts, imagePrompt, platforms, { idea, tone, url });
     } catch (e: any) {
