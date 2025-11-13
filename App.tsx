@@ -7,7 +7,6 @@ import { PostCard } from './components/PostCard';
 import { ShareModal } from './components/ShareModal';
 import { RefineModal } from './components/RefineModal';
 import { HistoryPanel } from './components/HistoryPanel';
-import { SettingsPanel } from './components/SettingsPanel';
 import { LandingPage } from './components/LandingPage';
 import { Auth } from './components/Auth';
 import { Header } from './components/Header';
@@ -275,7 +274,6 @@ const App: React.FC = () => {
         </main>
         
         <aside className="w-80 bg-card border-l border-border p-4 flex-col gap-4 hidden xl:flex overflow-y-auto">
-          <SettingsPanel userProfile={userProfile} onSave={handleSaveProfile} isSaving={isSavingProfile} />
           <HistoryPanel history={history} onLoad={handleLoadHistory} onDelete={handleDeleteHistory} isLoading={isLoading && history.length === 0} />
         </aside>
       </div>

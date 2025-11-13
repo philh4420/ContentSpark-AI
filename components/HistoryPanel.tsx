@@ -13,7 +13,7 @@ interface HistoryPanelProps {
 
 export const HistoryPanel: React.FC<HistoryPanelProps> = ({ history, onLoad, onDelete, isLoading }) => {
   return (
-    <div className="flex flex-col gap-4 border-t border-border pt-4 flex-shrink min-h-0">
+    <div className="flex flex-col gap-4 flex-shrink min-h-0 h-full">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
             <HistoryIcon className="w-5 h-5 text-muted-foreground" />
