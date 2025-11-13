@@ -1,22 +1,31 @@
+
 import React, { useState, useRef, useEffect } from 'react';
-import { TONES, PLATFORMS } from '../constants';
-import type { Tone, SocialPlatform, PlatformConfig, HistoryItem } from '../types';
+import { PLATFORMS } from '../constants';
+import type { SocialPlatform, PlatformConfig, HistoryItem, AdvancedToneProfile } from '../types';
 import { SparklesIcon } from './icons/SparklesIcon';
 import { LightbulbIcon } from './icons/LightbulbIcon';
 import { UploadIcon } from './icons/UploadIcon';
 import { XCircleIcon } from './icons/XCircleIcon';
 import { TrendingUpIcon } from './icons/TrendingUpIcon';
 import { LinkIcon } from './icons/LinkIcon';
+import { AdvancedToneMixer } from './AdvancedToneMixer';
 
 type GenerationMode = 'idea' | 'url' | 'trends';
 
 interface InputFormProps {
-  onGenerate: (idea: string, platforms: PlatformConfig[], tone: Tone, baseImage?: { data: string, mimeType: string }) => void;
-  onGenerateFromUrl: (url: string, platforms: PlatformConfig[], tone: Tone) => void;
+  onGenerate: (idea: string, platforms: PlatformConfig[], tone: AdvancedToneProfile, baseImage?: { data: string, mimeType: string }) => void;
+  onGenerateFromUrl: (url: string, platforms: PlatformConfig[], tone: AdvancedToneProfile) => void;
   getTrendingTopics: (industry: string) => Promise<string[]>;
   isLoading: boolean;
   historyItemToLoad?: HistoryItem | null;
 }
+
+const defaultToneProfile: AdvancedToneProfile = {
+    formality: 50,
+    humor: 50,
+    urgency: 50,
+    enthusiasm: 50,
+};
 
 export const InputForm: React.FC<InputFormProps> = ({ onGenerate, onGenerateFromUrl, getTrendingTopics, isLoading, historyItemToLoad }) => {
   const [mode, setMode] = useState<GenerationMode>('idea');
@@ -35,7 +44,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onGenerate, onGenerateFrom
 
   // Common State
   const [selectedPlatforms, setSelectedPlatforms] = useState<Set<SocialPlatform>>(new Set(['LinkedIn', 'Twitter']));
-  const [selectedTone, setSelectedTone] = useState<Tone>('Professional');
+  const [toneProfile, setToneProfile] = useState<AdvancedToneProfile>(defaultToneProfile);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -48,7 +57,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onGenerate, onGenerateFrom
         setMode('idea');
         setIdea(historyItemToLoad.idea);
       }
-      setSelectedTone(historyItemToLoad.tone);
+      setToneProfile(historyItemToLoad.tone);
       setSelectedPlatforms(new Set(historyItemToLoad.platforms));
       if (historyItemToLoad.baseImage) {
         setBaseImage({ 
@@ -114,9 +123,9 @@ export const InputForm: React.FC<InputFormProps> = ({ onGenerate, onGenerateFrom
     if (platformConfigs.length === 0) return;
     
     if (mode === 'idea' && idea.trim()) {
-      onGenerate(idea, platformConfigs, selectedTone, baseImage ? { data: baseImage.data, mimeType: baseImage.mimeType } : undefined);
+      onGenerate(idea, platformConfigs, toneProfile, baseImage ? { data: baseImage.data, mimeType: baseImage.mimeType } : undefined);
     } else if (mode === 'url' && url.trim()) {
-      onGenerateFromUrl(url, platformConfigs, selectedTone);
+      onGenerateFromUrl(url, platformConfigs, toneProfile);
     }
   };
 
@@ -205,16 +214,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onGenerate, onGenerateFrom
         </div>
       </div>
       
-      <div className="space-y-3">
-        <label className="font-semibold text-foreground">Set the tone</label>
-        <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
-          {TONES.map(tone => (
-            <button key={tone} type="button" onClick={() => setSelectedTone(tone)} className={`p-3 border-2 rounded-lg text-center font-semibold transition-all duration-200 ${selectedTone === tone ? 'bg-primary/10 border-primary text-primary' : 'bg-muted border-transparent hover:border-border'}`}>
-              {tone}
-            </button>
-          ))}
-        </div>
-      </div>
+      <AdvancedToneMixer value={toneProfile} onChange={setToneProfile} />
 
       <button
         type="submit"
@@ -223,7 +223,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onGenerate, onGenerateFrom
       >
         {isLoading ? (
           <>
-            <svg className="animate-spin -ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            <svg className="animate-spin -ml-1 mr-3 h-5 w-5" xmlns="http://www.w.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
             Generating...
           </>
         ) : (

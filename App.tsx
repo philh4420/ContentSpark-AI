@@ -18,7 +18,7 @@ import { saveUserProfile, getUserProfile, saveHistoryItem, getHistory, deleteHis
 import useLocalStorage from './hooks/useLocalStorage';
 import { auth } from './firebase';
 
-import type { PostData, Tone, SocialPlatform, PlatformConfig, HistoryItem, UserProfile, User } from './types';
+import type { PostData, SocialPlatform, PlatformConfig, HistoryItem, UserProfile, User, AdvancedToneProfile } from './types';
 
 type AuthMode = 'signin' | 'signup';
 
@@ -93,7 +93,7 @@ const App: React.FC = () => {
     generatedPosts: any[],
     imagePrompt: string,
     platforms: PlatformConfig[],
-    generationMeta: { idea: string, tone: Tone, url?: string, baseImage?: { data: string, mimeType: string } }
+    generationMeta: { idea: string, tone: AdvancedToneProfile, url?: string, baseImage?: { data: string, mimeType: string } }
   ) => {
       const imagePromises = platforms.map(p => generateImage(imagePrompt, p.aspectRatio));
       const base64Images = await Promise.all(imagePromises);
@@ -126,7 +126,7 @@ const App: React.FC = () => {
       }
   };
 
-  const handleGenerate = async (idea: string, platforms: PlatformConfig[], tone: Tone, baseImage?: {data: string, mimeType: string}) => {
+  const handleGenerate = async (idea: string, platforms: PlatformConfig[], tone: AdvancedToneProfile, baseImage?: {data: string, mimeType: string}) => {
     setIsLoading(true);
     setError(null);
     setPosts([]);
@@ -145,7 +145,7 @@ const App: React.FC = () => {
     }
   };
 
-  const handleGenerateFromUrl = async (url: string, platforms: PlatformConfig[], tone: Tone) => {
+  const handleGenerateFromUrl = async (url: string, platforms: PlatformConfig[], tone: AdvancedToneProfile) => {
     setIsLoading(true);
     setError(null);
     setPosts([]);

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import type { Tone, PlatformConfig, SocialPlatform } from './types';
+import type { PlatformConfig, SocialPlatform } from './types';
 import { LinkedInIcon } from './components/icons/LinkedInIcon';
 import { TwitterIcon } from './components/icons/TwitterIcon';
 import { InstagramIcon } from './components/icons/InstagramIcon';
@@ -8,7 +8,13 @@ import { FacebookIcon } from './components/icons/FacebookIcon';
 import { PinterestIcon } from './components/icons/PinterestIcon';
 import { TikTokIcon } from './components/icons/TikTokIcon';
 
-export const TONES: Tone[] = ['Professional', 'Witty', 'Urgent', 'Friendly', 'Inspirational'];
+export const TONE_PROFILES = [
+    { id: 'formality', label: 'Formality', minLabel: 'Casual', maxLabel: 'Formal', defaultValue: 50 },
+    { id: 'humor', label: 'Humor', minLabel: 'Serious', maxLabel: 'Witty', defaultValue: 50 },
+    { id: 'urgency', label: 'Urgency', minLabel: 'Patient', maxLabel: 'Urgent', defaultValue: 50 },
+    { id: 'enthusiasm', label: 'Enthusiasm', minLabel: 'Reserved', maxLabel: 'Enthusiastic', defaultValue: 50 },
+] as const;
+
 
 export const PLATFORMS: PlatformConfig[] = [
   { name: 'LinkedIn', aspectRatio: '16:9' },

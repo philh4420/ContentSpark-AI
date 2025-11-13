@@ -1,6 +1,4 @@
 
-export type Tone = 'Professional' | 'Witty' | 'Urgent' | 'Friendly' | 'Inspirational';
-
 export type SocialPlatform = 'LinkedIn' | 'Twitter' | 'Instagram' | 'Facebook' | 'Pinterest' | 'TikTok';
 
 export interface PlatformConfig {
@@ -15,10 +13,17 @@ export interface PostData {
   imageUrl: string;
 }
 
+export interface AdvancedToneProfile {
+  formality: number;
+  humor: number;
+  urgency: number;
+  enthusiasm: number;
+}
+
 export interface HistoryItem {
   id: string;
   idea: string;
-  tone: Tone;
+  tone: AdvancedToneProfile;
   url?: string;
   platforms: SocialPlatform[];
   imagePrompt: string;

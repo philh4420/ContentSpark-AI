@@ -1,6 +1,7 @@
+
 import { GoogleGenAI, GenerateContentResponse, Type } from "@google/genai";
 // FIX: Add SocialPlatform to imports to resolve type error in refinePostText.
-import type { PlatformConfig, Tone, UserProfile, SocialPlatform } from '../types';
+import type { PlatformConfig, UserProfile, SocialPlatform, AdvancedToneProfile } from '../types';
 
 // FIX: Use process.env.API_KEY, which is made available by the build process
 // (via vite.config.js on Vercel). This provides a single, consistent way
@@ -67,7 +68,7 @@ const urlContentSchema = {
 export const generateSocialPosts = async (
   idea: string,
   platforms: PlatformConfig[],
-  tone: Tone,
+  tone: AdvancedToneProfile,
   userProfile: UserProfile,
   baseImage?: { data: string; mimeType: string; }
 ): Promise<GenerateContentResponse> => {
@@ -81,17 +82,20 @@ export const generateSocialPosts = async (
   2.  **Incorporate Brand Profile:**
       -   **Brand Voice:** ${userProfile.brandVoice || 'Professional and engaging.'}
       -   **Target Audience:** ${userProfile.targetAudience || 'A general audience.'}
-  3.  **Craft Platform-Specific Posts:**
+  3.  **Apply the Advanced Tone Profile:** Blend the following tonal qualities based on a 0-100 scale:
+      -   **Formality: ${tone.formality}/100** (0 is very casual, 100 is very formal).
+      -   **Humor: ${tone.humor}/100** (0 is serious, 100 is very witty).
+      -   **Urgency: ${tone.urgency}/100** (0 is patient, 100 is highly urgent).
+      -   **Enthusiasm: ${tone.enthusiasm}/100** (0 is reserved, 100 is highly enthusiastic).
+  4.  **Craft Platform-Specific Posts:**
       -   Generate one post for each of the following platforms: ${platformNames}.
-      -   Tailor the content, length, and style for each platform's best practices.
-      -   Apply the requested tone: **${tone}**.
+      -   Tailor the content, length, and style for each platform's best practices, infused with the tone profile above.
       -   Include relevant hashtags.
-  4.  **Create a Visually Rich Image Prompt:**
+  5.  **Create a Visually Rich Image Prompt:**
       -   Based on the user's idea, create a single, detailed, and descriptive prompt for an AI image generator (like Imagen).
       -   The prompt should describe a visually appealing, high-quality image that can be used across all the generated social media posts. Focus on a single, coherent scene.
-      -   Example: "A photorealistic image of a majestic lion standing on a rock overlooking the savanna at sunset, with a warm, golden light."
-  5.  **Adhere to the JSON Schema:** Format your entire response according to the provided JSON schema.
-  ${baseImage ? '6. **Analyze the Provided Image:** The user has provided an image. Your generated posts and image prompt should be relevant to, or build upon, the content of this image.' : ''}
+  6.  **Adhere to the JSON Schema:** Format your entire response according to the provided JSON schema.
+  ${baseImage ? '7. **Analyze the Provided Image:** The user has provided an image. Your generated posts and image prompt should be relevant to, or build upon, the content of this image.' : ''}
   `;
 
   const contents = {
@@ -115,13 +119,11 @@ export const generateSocialPosts = async (
 export const generatePostContentFromUrl = (
   url: string,
   platforms: PlatformConfig[],
-  tone: Tone,
+  tone: AdvancedToneProfile,
   userProfile: UserProfile,
 ): Promise<GenerateContentResponse> => {
     const platformNames = platforms.map(p => p.name).join(', ');
 
-    // When using googleSearch, we can't enforce a JSON schema directly.
-    // Instead, we explicitly instruct the model in the prompt to return a JSON object.
     const systemInstruction = `You are ContentSpark AI, a web content analyst and social media expert. Your task is to analyze the provided URL using Google Search and generate social media content.
 
     **Instructions:**
@@ -130,10 +132,14 @@ export const generatePostContentFromUrl = (
     3.  **Create an Image Prompt:** Based on the content, devise a single, detailed, and visually rich prompt for an AI image generator.
     4.  **Craft Platform-Specific Posts:**
         -   Generate one post for each of these platforms: ${platformNames}.
-        -   Tailor the text for each platform, incorporating the **${tone}** tone.
         -   Incorporate the user's brand profile:
             -   **Brand Voice:** ${userProfile.brandVoice || 'Professional and engaging.'}
             -   **Target Audience:** ${userProfile.targetAudience || 'A general audience.'}
+        -   Apply the Advanced Tone Profile (blend the following on a 0-100 scale):
+            -   **Formality: ${tone.formality}/100** (0=casual, 100=formal).
+            -   **Humor: ${tone.humor}/100** (0=serious, 100=witty).
+            -   **Urgency: ${tone.urgency}/100** (0=patient, 100=urgent).
+            -   **Enthusiasm: ${tone.enthusiasm}/100** (0=reserved, 100=enthusiastic).
     5.  **Return a JSON Object:** You MUST format your entire response as a single, valid JSON object with the following structure: { "idea": "...", "imagePrompt": "...", "posts": [{ "platform": "...", "text": "..." }] }. Do not include any other text or markdown formatting outside of this JSON object.`;
     
     return ai.models.generateContent({

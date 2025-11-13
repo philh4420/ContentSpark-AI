@@ -11,6 +11,10 @@ interface HistoryPanelProps {
   isLoading: boolean;
 }
 
+const formatToneProfile = (tone: HistoryItem['tone']): string => {
+    return `F:${tone.formality} H:${tone.humor} U:${tone.urgency} E:${tone.enthusiasm}`;
+}
+
 export const HistoryPanel: React.FC<HistoryPanelProps> = ({ history, onLoad, onDelete, isLoading }) => {
   return (
     <div className="flex flex-col gap-4 flex-shrink min-h-0 h-full">
@@ -32,7 +36,7 @@ export const HistoryPanel: React.FC<HistoryPanelProps> = ({ history, onLoad, onD
             >
                 <button onClick={() => onLoad(item)} className="w-full text-left">
                     <p className="text-sm font-semibold truncate text-accent-foreground">{item.idea}</p>
-                    <p className="text-xs text-muted-foreground">{item.tone}</p>
+                    <p className="text-xs text-muted-foreground">{formatToneProfile(item.tone)}</p>
                 </button>
                 <button
                     onClick={() => onDelete(item.id)}
