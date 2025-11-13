@@ -1,0 +1,128 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ContentSpark AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      :root {
+        --background: oklch(1.0000 0 0);
+        --foreground: oklch(0.1884 0.0128 248.5103);
+        --card: oklch(0.9784 0.0011 197.1387);
+        --card-foreground: oklch(0.1884 0.0128 248.5103);
+        --popover: oklch(1.0000 0 0);
+        --popover-foreground: oklch(0.1884 0.0128 248.5103);
+        --primary: oklch(0.6723 0.1606 244.9955);
+        --primary-foreground: oklch(1.0000 0 0);
+        --secondary: oklch(0.1884 0.0128 248.5103);
+        --secondary-foreground: oklch(1.0000 0 0);
+        --muted: oklch(0.9222 0.0013 286.3737);
+        --muted-foreground: oklch(0.1884 0.0128 248.5103);
+        --accent: oklch(0.9392 0.0166 250.8453);
+        --accent-foreground: oklch(0.6723 0.1606 244.9955);
+        --destructive: oklch(0.6188 0.2376 25.7658);
+        --destructive-foreground: oklch(1.0000 0 0);
+        --border: oklch(0.9317 0.0118 231.6594);
+        --input: oklch(0.9809 0.0025 228.7836);
+        --ring: oklch(0.6818 0.1584 243.3540);
+        --radius: 1.3rem;
+        --font-sans: 'Open Sans', sans-serif;
+      }
+
+      .dark {
+        --background: oklch(0.15 0.01 248.51);
+        --foreground: oklch(0.9328 0.0025 228.7857);
+        --card: oklch(0.2097 0.0080 274.5332);
+        --card-foreground: oklch(0.9328 0.0025 228.7857);
+        --popover: oklch(0 0 0);
+        --popover-foreground: oklch(0.9328 0.0025 228.7857);
+        --primary: oklch(0.6692 0.1607 245.0110);
+        --primary-foreground: oklch(1.0000 0 0);
+        --secondary: oklch(0.9622 0.0035 219.5331);
+        --secondary-foreground: oklch(0.1884 0.0128 248.5103);
+        --muted: oklch(0.23 0.008 274.53);
+        --muted-foreground: oklch(0.5637 0.0078 247.9662);
+        --accent: oklch(0.1928 0.0331 242.5459);
+        --accent-foreground: oklch(0.6692 0.1607 245.0110);
+        --destructive: oklch(0.6188 0.2376 25.7658);
+        --destructive-foreground: oklch(1.0000 0 0);
+        --border: oklch(0.2674 0.0047 248.0045);
+        --input: oklch(0.25 0.01 248);
+        --ring: oklch(0.6818 0.1584 243.3540);
+      }
+    </style>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['var(--font-sans)', 'sans-serif'],
+            },
+            colors: {
+              background: 'var(--background)',
+              foreground: 'var(--foreground)',
+              card: 'var(--card)',
+              'card-foreground': 'var(--card-foreground)',
+              popover: 'var(--popover)',
+              'popover-foreground': 'var(--popover-foreground)',
+              primary: 'var(--primary)',
+              'primary-foreground': 'var(--primary-foreground)',
+              secondary: 'var(--secondary)',
+              'secondary-foreground': 'var(--secondary-foreground)',
+              muted: 'var(--muted)',
+              'muted-foreground': 'var(--muted-foreground)',
+              accent: 'var(--accent)',
+              'accent-foreground': 'var(--accent-foreground)',
+              destructive: 'var(--destructive)',
+              'destructive-foreground': 'var(--destructive-foreground)',
+              border: 'var(--border)',
+              input: 'var(--input)',
+              ring: 'var(--ring)',
+            },
+            borderRadius: {
+              lg: 'var(--radius)',
+              md: 'calc(var(--radius) - 2px)',
+              sm: 'calc(var(--radius) - 4px)',
+            },
+            animation: {
+              'fade-in': 'fadeIn 0.5s ease-in-out',
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: 0, transform: 'translateY(10px)' },
+                '100%': { opacity: 1, transform: 'translateY(0)' },
+              },
+            }
+          }
+        }
+      }
+    </script>
+    <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.29.0",
+    "firebase-functions": "https://aistudiocdn.com/firebase-functions@^7.0.0",
+    "axios": "https://aistudiocdn.com/axios@^1.13.2",
+    "firebase-admin": "https://aistudiocdn.com/firebase-admin@^13.6.0",
+    "firebase/": "https://aistudiocdn.com/firebase@^12.5.0/",
+    "twitter-api-v2": "https://aistudiocdn.com/twitter-api-v2@^1.27.0",
+    "crypto": "https://aistudiocdn.com/crypto@^1.0.1",
+    "uuid": "https://aistudiocdn.com/uuid@^13.0.0"
+  }
+}
+</script>
+</head>
+  <body class="bg-background text-foreground font-sans antialiased">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
