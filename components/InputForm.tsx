@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { PLATFORMS } from '../constants';
 import type { SocialPlatform, PlatformConfig, HistoryItem, AdvancedToneProfile } from '../types';
@@ -13,11 +12,12 @@ import { AdvancedToneMixer } from './AdvancedToneMixer';
 type GenerationMode = 'idea' | 'url' | 'trends';
 
 interface InputFormProps {
-  onGenerate: (idea: string, platforms: PlatformConfig[], tone: AdvancedToneProfile, baseImage?: { data: string, mimeType: string }) => void;
-  onGenerateFromUrl: (url: string, platforms: PlatformConfig[], tone: AdvancedToneProfile) => void;
+  onGenerate: (idea: string, platforms: PlatformConfig[], tone: AdvancedToneProfile, campaign: string, baseImage?: { data: string, mimeType: string }) => void;
+  onGenerateFromUrl: (url: string, platforms: PlatformConfig[], tone: AdvancedToneProfile, campaign: string) => void;
   getTrendingTopics: (industry: string) => Promise<string[]>;
   isLoading: boolean;
   historyItemToLoad?: HistoryItem | null;
+  campaigns: string[];
 }
 
 const defaultToneProfile: AdvancedToneProfile = {
@@ -27,7 +27,7 @@ const defaultToneProfile: AdvancedToneProfile = {
     enthusiasm: 50,
 };
 
-export const InputForm: React.FC<InputFormProps> = ({ onGenerate, onGenerateFromUrl, getTrendingTopics, isLoading, historyItemToLoad }) => {
+export const InputForm: React.FC<InputFormProps> = ({ onGenerate, onGenerateFromUrl, getTrendingTopics, isLoading, historyItemToLoad, campaigns }) => {
   const [mode, setMode] = useState<GenerationMode>('idea');
   
   // Idea Mode State
@@ -43,6 +43,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onGenerate, onGenerateFrom
   const [isTrendsLoading, setIsTrendsLoading] = useState(false);
 
   // Common State
+  const [campaign, setCampaign] = useState('');
   const [selectedPlatforms, setSelectedPlatforms] = useState<Set<SocialPlatform>>(new Set(['LinkedIn', 'Twitter']));
   const [toneProfile, setToneProfile] = useState<AdvancedToneProfile>(defaultToneProfile);
   
@@ -57,6 +58,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onGenerate, onGenerateFrom
         setMode('idea');
         setIdea(historyItemToLoad.idea);
       }
+      setCampaign(historyItemToLoad.campaign || '');
       setToneProfile(historyItemToLoad.tone);
       setSelectedPlatforms(new Set(historyItemToLoad.platforms));
       if (historyItemToLoad.baseImage) {
@@ -123,9 +125,9 @@ export const InputForm: React.FC<InputFormProps> = ({ onGenerate, onGenerateFrom
     if (platformConfigs.length === 0) return;
     
     if (mode === 'idea' && idea.trim()) {
-      onGenerate(idea, platformConfigs, toneProfile, baseImage ? { data: baseImage.data, mimeType: baseImage.mimeType } : undefined);
+      onGenerate(idea, platformConfigs, toneProfile, campaign, baseImage ? { data: baseImage.data, mimeType: baseImage.mimeType } : undefined);
     } else if (mode === 'url' && url.trim()) {
-      onGenerateFromUrl(url, platformConfigs, toneProfile);
+      onGenerateFromUrl(url, platformConfigs, toneProfile, campaign);
     }
   };
 
@@ -203,6 +205,21 @@ export const InputForm: React.FC<InputFormProps> = ({ onGenerate, onGenerateFrom
          </div>
       )}
 
+      <div className="space-y-2">
+        <label htmlFor="campaign" className="font-semibold text-foreground">Campaign (Optional)</label>
+        <input 
+            id="campaign" 
+            list="campaigns-list" 
+            value={campaign}
+            onChange={e => setCampaign(e.target.value)}
+            placeholder="e.g., Q4 Holiday Sale" 
+            className="w-full p-3 bg-input border border-border rounded-lg focus:ring-2 focus:ring-ring focus:border-ring" 
+        />
+        <datalist id="campaigns-list">
+            {campaigns.map(c => <option key={c} value={c} />)}
+        </datalist>
+      </div>
+
       <div className="space-y-3">
         <label className="font-semibold text-foreground">Choose platforms</label>
         <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
@@ -223,7 +240,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onGenerate, onGenerateFrom
       >
         {isLoading ? (
           <>
-            <svg className="animate-spin -ml-1 mr-3 h-5 w-5" xmlns="http://www.w.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            <svg className="animate-spin -ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
             Generating...
           </>
         ) : (

@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 import { InputForm } from './components/InputForm';
@@ -44,6 +43,15 @@ const App: React.FC = () => {
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   
   const [historyItemToLoad, setHistoryItemToLoad] = useState<HistoryItem | null>(null);
+  const [campaignFilter, setCampaignFilter] = useState<string | null>(null);
+
+  const campaigns = useMemo(() => 
+      Array.from(new Set(history.flatMap(item => item.campaign ? [item.campaign] : []))).sort(), 
+  [history]);
+  
+  const filteredHistory = useMemo(() => 
+      campaignFilter ? history.filter(item => item.campaign === campaignFilter) : history, 
+  [history, campaignFilter]);
   
   useEffect(() => {
     if (theme === 'dark') {
@@ -93,7 +101,7 @@ const App: React.FC = () => {
     generatedPosts: any[],
     imagePrompt: string,
     platforms: PlatformConfig[],
-    generationMeta: { idea: string, tone: AdvancedToneProfile, url?: string, baseImage?: { data: string, mimeType: string } }
+    generationMeta: { idea: string, tone: AdvancedToneProfile, url?: string, campaign?: string, baseImage?: { data: string, mimeType: string } }
   ) => {
       const imagePromises = platforms.map(p => generateImage(imagePrompt, p.aspectRatio));
       const base64Images = await Promise.all(imagePromises);
@@ -115,6 +123,7 @@ const App: React.FC = () => {
           idea: generationMeta.idea,
           tone: generationMeta.tone,
           url: generationMeta.url,
+          campaign: generationMeta.campaign || undefined,
           platforms: platforms.map(p => p.name),
           imagePrompt,
           timestamp: Date.now(),
@@ -126,7 +135,7 @@ const App: React.FC = () => {
       }
   };
 
-  const handleGenerate = async (idea: string, platforms: PlatformConfig[], tone: AdvancedToneProfile, baseImage?: {data: string, mimeType: string}) => {
+  const handleGenerate = async (idea: string, platforms: PlatformConfig[], tone: AdvancedToneProfile, campaign: string, baseImage?: {data: string, mimeType: string}) => {
     setIsLoading(true);
     setError(null);
     setPosts([]);
@@ -136,7 +145,7 @@ const App: React.FC = () => {
       const response = await generateSocialPosts(idea, platforms, tone, userProfile, baseImage);
       const jsonResponse = JSON.parse(response.text);
       const { imagePrompt, posts: generatedPosts } = jsonResponse;
-      await processAndSavePosts(generatedPosts, imagePrompt, platforms, { idea, tone, baseImage });
+      await processAndSavePosts(generatedPosts, imagePrompt, platforms, { idea, tone, campaign, baseImage });
     } catch (e: any) {
       console.error(e);
       setError(`An error occurred during generation: ${e.message}`);
@@ -145,7 +154,7 @@ const App: React.FC = () => {
     }
   };
 
-  const handleGenerateFromUrl = async (url: string, platforms: PlatformConfig[], tone: AdvancedToneProfile) => {
+  const handleGenerateFromUrl = async (url: string, platforms: PlatformConfig[], tone: AdvancedToneProfile, campaign: string) => {
     setIsLoading(true);
     setError(null);
     setPosts([]);
@@ -170,7 +179,7 @@ const App: React.FC = () => {
 
       const jsonResponse = JSON.parse(responseText);
       const { imagePrompt, posts: generatedPosts, idea } = jsonResponse;
-      await processAndSavePosts(generatedPosts, imagePrompt, platforms, { idea, tone, url });
+      await processAndSavePosts(generatedPosts, imagePrompt, platforms, { idea, tone, url, campaign });
     } catch (e: any) {
       console.error(e);
       setError(`An error occurred while generating from URL: ${e.message}`);
@@ -248,6 +257,7 @@ const App: React.FC = () => {
             getTrendingTopics={getTrendingTopics}
             isLoading={isLoading}
             historyItemToLoad={historyItemToLoad}
+            campaigns={campaigns}
           />
               
           {error && <div className="bg-destructive/10 text-destructive p-3 rounded-md text-sm font-semibold">{error}</div>}
@@ -274,7 +284,15 @@ const App: React.FC = () => {
         </main>
         
         <aside className="w-80 bg-card border-l border-border p-4 flex-col gap-4 hidden xl:flex overflow-y-auto">
-          <HistoryPanel history={history} onLoad={handleLoadHistory} onDelete={handleDeleteHistory} isLoading={isLoading && history.length === 0} />
+          <HistoryPanel 
+            history={filteredHistory} 
+            onLoad={handleLoadHistory} 
+            onDelete={handleDeleteHistory} 
+            isLoading={isLoading && history.length === 0}
+            campaigns={campaigns}
+            activeFilter={campaignFilter}
+            onSetFilter={setCampaignFilter}
+          />
         </aside>
       </div>
 

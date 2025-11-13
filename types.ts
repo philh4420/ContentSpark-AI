@@ -1,4 +1,4 @@
-
+// FIX: Removed self-import of `SocialPlatform` which caused a conflict with its local declaration.
 export type SocialPlatform = 'LinkedIn' | 'Twitter' | 'Instagram' | 'Facebook' | 'Pinterest' | 'TikTok';
 
 export interface PlatformConfig {
@@ -30,6 +30,7 @@ export interface HistoryItem {
   timestamp: number;
   posts: PostData[];
   baseImage?: string;
+  campaign?: string;
 }
 
 export interface User {
