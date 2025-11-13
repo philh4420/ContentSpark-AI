@@ -1,5 +1,6 @@
 
-import { GoogleGenAI, GenerateContentResponse, Type } from "@google/genai";
+
+import { GoogleGenAI, GenerateContentResponse, Type, Modality } from "@google/genai";
 // FIX: Add SocialPlatform to imports to resolve type error in refinePostText.
 import type { PlatformConfig, UserProfile, SocialPlatform, AdvancedToneProfile } from '../types';
 
@@ -153,16 +154,27 @@ export const generatePostContentFromUrl = (
 };
 
 export const generateImage = async (prompt: string, aspectRatio: string): Promise<string> => {
-    const response = await ai.models.generateImages({
-        model: 'imagen-4.0-generate-001',
-        prompt: prompt,
+    // Hint at the aspect ratio in the prompt, as it's not a direct config for this model.
+    const fullPrompt = `${prompt}. Generate the image with a ${aspectRatio} aspect ratio.`;
+    
+    const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash-image',
+        contents: {
+            parts: [{ text: fullPrompt }],
+        },
         config: {
-            numberOfImages: 1,
-            aspectRatio: aspectRatio,
-            outputMimeType: 'image/jpeg',
+            responseModalities: [Modality.IMAGE],
         },
     });
-    return response.generatedImages[0].image.imageBytes;
+
+    for (const part of response.candidates[0].content.parts) {
+        if (part.inlineData) {
+            return part.inlineData.data; // This is the base64 string
+        }
+    }
+    
+    // If we get here, no image was returned.
+    throw new Error("Image generation failed: No image data was returned from the API.");
 };
 
 
